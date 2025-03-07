@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoundTag</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .button {
+            background-color: #333;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="title">Створити власний саундтег</h1>
+    <button class="button" onclick="createTag()">Створити</button>
+
+    <script>
+        function getLanguage() {
+            let lang = navigator.language || navigator.userLanguage;
+            if (lang.startsWith("ru")) return "ru";
+            if (lang.startsWith("en")) return "en";
+            return "ua";
+        }
+
+        const translations = {
+            "ua": { "title": "Створити власний саундтег", "button": "Створити" },
+            "en": { "title": "Create your own SoundTag", "button": "Create" },
+            "ru": { "title": "Создать свой саундтег", "button": "Создать" }
+        };
+
+        let lang = getLanguage();
+        document.getElementById("title").innerText = translations[lang]["title"];
+        document.querySelector(".button").innerText = translations[lang]["button"];
+
+        function createTag() {
+            let tagId = Math.random().toString(36).substr(2, 10);
+            fetch('save_link.php?link=' + tagId);
+            window.location.href = "tag/" + tagId + ".html";
+        }
+    </script>
+
+</body>
+</html>

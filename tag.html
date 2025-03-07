@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoundTag</title>
+    <style>
+        body { background-color: #121212; color: white; text-align: center; padding-top: 50px; }
+        .button { background-color: #333; color: white; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-size: 16px; }
+        input, label { margin-top: 10px; color: white; display: block; }
+    </style>
+</head>
+<body>
+
+    <h1 id="title">Ваш саундтег</h1>
+    <label id="uploadText">Завантажте аудіо:</label>
+    <input type="file" id="audioFile" accept="audio/*">
+    <label id="uploadImageText">Завантажте фото:</label>
+    <input type="file" id="imageFile" accept="image/*">
+    
+    <label id="bassBoost">Посилення басів:</label>
+    <input type="range" id="bass" min="0" max="5" step="1">
+    <label id="volumeBoost">Посилення гучності:</label>
+    <input type="range" id="volume" min="1" max="3" step="0.1">
+
+    <button class="button" onclick="playSound()">Відтворити</button>
+    <audio id="audio" autoplay loop></audio>
+    <img id="image" style="max-width: 300px; display: none; margin-top: 20px;">
+
+    <script>
+        function getLanguage() {
+            let lang = navigator.language || navigator.userLanguage;
+            if (lang.startsWith("ru")) return "ru";
+            if (lang.startsWith("en")) return "en";
+            return "ua";
+        }
+
+        const translations = {
+            "ua": { "title": "Ваш саундтег", "uploadText": "Завантажте аудіо:", "uploadImageText": "Завантажте фото:", "bassBoost": "Посилення басів:", "volumeBoost": "Посилення гучності:", "play": "Відтворити" },
+            "en": { "title": "Your SoundTag", "uploadText": "Upload audio:", "uploadImageText": "Upload image:", "bassBoost": "Bass Boost:", "volumeBoost": "Volume Boost:", "play": "Play" },
+            "ru": { "title": "Ваш саундтег", "uploadText": "Загрузите аудио:", "uploadImageText": "Загрузите фото:", "bassBoost": "Усиление басов:", "volumeBoost": "Усиление громкости:", "play": "Воспроизвести" }
+        };
+
+        let lang = getLanguage();
+        document.getElementById("title").innerText = translations[lang]["title"];
+        document.getElementById("uploadText").innerText = translations[lang]["uploadText"];
+        document.getElementById("uploadImageText").innerText = translations[lang]["uploadImageText"];
+        document.getElementById("bassBoost").innerText = translations[lang]["bassBoost"];
+        document.getElementById("volumeBoost").innerText = translations[lang]["volumeBoost"];
+        document.querySelector(".button").innerText = translations[lang]["play"];
+
+        document.getElementById("audioFile").addEventListener("change", function(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let url = URL.createObjectURL(file);
+                document.getElementById("audio").src = url;
+            }
+        });
+
+        document.getElementById("imageFile").addEventListener("change", function(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let url = URL.createObjectURL(file);
+                document.getElementById("image").src = url;
+                document.getElementById("image").style.display = "block";
+            }
+        });
+
+        function playSound() {
+            let audio = document.getElementById("audio");
+            let bassLevel = document.getElementById("bass").value;
+            let volumeLevel = document.getElementById("volume").value;
+
+            // Симуляція бас-бусту через Web Audio API
+            let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            let source = audioContext.createMediaElementSource(audio);
+            let bass = audioContext.createBiquadFilter();
+            bass.type = "lowshelf";
+            bass.frequency.value = 200;
+            bass.gain.value = bassLevel * 5; 
+
+            let gain = audioContext.createGain();
+            gain.gain.value = volumeLevel;
+
+            source.connect(bass);
+            bass.connect(gain);
+            gain.connect(audioContext.destination);
+
+            audio.play();
+        }
+    </script>
+
+</body>
+</html>
